@@ -15,7 +15,7 @@ namespace SocketServer
         {
             Logger logger = LogManager.GetCurrentClassLogger();
             int maxConn = 10;
-            logger.Trace("-----------------------------------------------------------------------");
+            logger.Trace("--------------------------------------------------------------  New Instance started...");
 
             // Устанавливаем для сокета локальную конечную точку
             //IPHostEntry ipHost = Dns.GetHostEntry("localhost");
@@ -30,7 +30,7 @@ namespace SocketServer
             int port = 11000;
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port);
             
-            Console.WriteLine("host name is: {0} ", ipHost);
+            Console.WriteLine("Host name is: {0} ", ipHost);
           //  Console.WriteLine("host array size is: {0}", size);
             Console.WriteLine("IP is " + ipAddr);
             logger.Trace("Endpoint Host is {0} on Port {1} at Host {2}", ipAddr, port.ToString(), ipHost);
@@ -47,7 +47,7 @@ namespace SocketServer
                 // Начинаем слушать соединения
                 while (true)
                 {
-                    Console.WriteLine("Ожидаем соединение через порт {0}", ipEndPoint);
+                    Console.WriteLine("Waiting on port {0}", ipEndPoint);
                     logger.Trace("start listening with {0} max connection", maxConn);
                     // Программа приостанавливается, ожидая входящее соединение
                     Socket handler = sListener.Accept();
@@ -61,18 +61,17 @@ namespace SocketServer
                     data += Encoding.UTF8.GetString(bytes, 0, bytesRec);
 
                     // Показываем данные на консоли
-                    Console.Write("Полученный текст: " + data + "\n\n");
-                    logger.Trace("Полученный текст: {0}", data);
+                    Console.Write("Received Message text: " + data + "\n\n");
+                    logger.Trace("Received Message text: {0}", data);
 
                     // Отправляем ответ клиенту\
-                    string reply = "Спасибо за запрос в " + data.Length.ToString()
-                            + " символов";
+                    string reply = "Echo of request of " + data.Length.ToString()  + " chars length";
                     byte[] msg = Encoding.UTF8.GetBytes(reply);
                     handler.Send(msg);
 
                     if (data.IndexOf("<EOF>") > -1)
                     {
-                        Console.WriteLine("Сервер завершил соединение с клиентом.");
+                        Console.WriteLine("Server is shutting down...");
                         logger.Trace("Shutting down...");
                         break;
                     }
