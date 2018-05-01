@@ -71,7 +71,7 @@ namespace SocketServer
 
 
                 Client cli1 = new Client("1410000000", "Central WH");
-                Client cli2 = new Client("1410000001", "2nd WH");
+                Client cli2 = new Client("1410000001", "სან სთორზ");
                 Client cli3 = new Client("1410000002", "СкладЪ");
 
                 Client[] people = new Client[] { cli1, cli2, cli3 };
@@ -95,7 +95,7 @@ namespace SocketServer
                     byte[] bytes = new byte[1024];
                     int bytesRec = handler.Receive(bytes);
 
-                    data += Encoding.UTF8.GetString(bytes, 0, bytesRec);
+                    data += Encoding.Default.GetString(bytes, 0, bytesRec); ////  not   Encoding.UTF8.GetString   !!!!!
 
                     // Показываем данные на консоли
                     Console.Write("Received Message text: " + data + "\n\n");
@@ -109,7 +109,7 @@ namespace SocketServer
 
                     ///////   serialized JSON
                     byte[] bytez = mem.ToArray();
-                    var str = System.Text.Encoding.UTF8.GetString(bytez);
+                    var str = System.Text.Encoding.Default.GetString(bytez);  ///  default! not UTF8!!!!
 
                     logger.Debug("Reply: {0}", str);
 
