@@ -6,9 +6,33 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using NLog;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.IO;
 
 namespace SocketServer
 {
+
+    [DataContract]
+    public class Client
+    {
+        [DataMember]
+        public string Account { get; set; }
+
+        [DataMember]
+        public string Name { get; set; }
+
+
+        public Client(string account, string name)
+        {
+            Account = account;
+            Name = name;
+        }
+
+    }
+
+
+
     class Program
     {
         static void Main(string[] args)
@@ -34,6 +58,8 @@ namespace SocketServer
           //  Console.WriteLine("host array size is: {0}", size);
             Console.WriteLine("IP is " + ipAddr);
             logger.Trace("Endpoint Host is {0} on Port {1} at Host {2}", ipAddr, port.ToString(), ipHost);
+
+            //string delimiter = " | ";
             
             // Создаем сокет Tcp/Ip
             Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -42,7 +68,18 @@ namespace SocketServer
             {
                 sListener.Bind(ipEndPoint);
                 sListener.Listen(maxConn);
-            
+
+
+                Client cli1 = new Client("1410000000", "Central WH");
+                Client cli2 = new Client("1410000001", "2nd WH");
+                Client cli3 = new Client("1410000002", "СкладЪ");
+
+                Client[] people = new Client[] { cli1, cli2, cli3 };
+
+                DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Client[]));
+                MemoryStream mem = new MemoryStream();
+                jsonFormatter.WriteObject(mem, people);
+
 
                 // Начинаем слушать соединения
                 while (true)
@@ -65,9 +102,22 @@ namespace SocketServer
                     logger.Trace("Received Message text: {0}", data);
 
                     // Отправляем ответ клиенту\
-                    string reply = "Echo of request of " + data.Length.ToString()  + " chars length";
-                    byte[] msg = Encoding.UTF8.GetBytes(reply);
-                    handler.Send(msg);
+                    //string reply = "Echo of request of " + data.Length.ToString()  + " chars length";
+                    //string reply = "1410123456" + delimiter + "Test name of account";
+                    //byte[] msg = Encoding.UTF8.GetBytes(reply);
+
+
+                    ///////   serialized JSON
+                    byte[] bytez = mem.ToArray();
+                    var str = System.Text.Encoding.UTF8.GetString(bytez);
+
+                    logger.Debug("Reply: {0}", str);
+
+                    Console.WriteLine("Reply: {0}",str);
+                   
+                    ///
+                    
+                    handler.Send(bytez);
 
                     if (data.IndexOf("<EOF>") > -1)
                     {
