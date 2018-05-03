@@ -73,8 +73,16 @@ namespace SocketServer
                 Client cli1 = new Client("1410000000", "Central WH");
                 Client cli2 = new Client("1410000001", "სან სთორზ");
                 Client cli3 = new Client("1410000002", "СкладЪ");
+                Client cli4 = new Client("1410000003", "Batumi");
+                Client cli5 = new Client("1410000004", "Kutaisi");
+                Client cli6 = new Client("1410000005", "Rustavi");
+                Client cli7 = new Client("1410000006", "Kakheti");
+                Client cli8 = new Client("1410000007", "Poti");
+                Client cli9 = new Client("1410000008", "ახალციხე");
+                Client cli10 = new Client("1410000009", "Gori");
 
-                Client[] people = new Client[] { cli1, cli2, cli3 };
+
+                Client[] people = new Client[] { cli1, cli2, cli3, cli4, cli5, cli6, cli7, cli8, cli9, cli10 };
 
                 DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Client[]));
                 MemoryStream mem = new MemoryStream();
