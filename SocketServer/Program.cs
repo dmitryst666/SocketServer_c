@@ -121,15 +121,23 @@ namespace SocketServer
                     //string reply = "1410123456" + delimiter + "Test name of account";
                     //byte[] msg = Encoding.UTF8.GetBytes(reply);
 
-                    if (data.Length < 30) /// max10 = 'CHECK' + max10 user + max10 password
+                    if (data.Substring(0,5) == "CHECK") /// 'CHECK' 
                     {
+
+
                         string[] parts = data.Split(delimiter);
-                        string reply = "pass";
-                        if (parts[0] == "CHECK") {/// process CHECK request
-                            bytez = System.Text.Encoding.Default.GetBytes(reply);
+                        int size = parts.Length;
+                        
+
+                        Console.WriteLine("parts count: {0}", size);
+                        string reply = "fail";
+                        
+                        if (size == 3) {/// process CHECK request
+                           
+                             reply = "pass";
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("CHECK request received");
-                            
+
                             Console.Write("Credentials: user = ");
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.Write(parts[1]);
@@ -144,6 +152,7 @@ namespace SocketServer
                             Console.Write(reply);
                             Console.WriteLine("\n");
                             Console.ResetColor();
+                            bytez = System.Text.Encoding.Default.GetBytes(reply);
                         } else
                         {
                             ///////   serialized JSON
