@@ -37,6 +37,8 @@ namespace SocketServer
     {
         static void Main(string[] args)
         {
+
+            char delimiter = '|';
             Logger logger = LogManager.GetCurrentClassLogger();
             int maxConn = 10;
             logger.Trace("--------------------------------------------------------------  New Instance started...");
@@ -53,10 +55,12 @@ namespace SocketServer
             IPAddress ipAddr = System.Net.Dns.GetHostByName(ipHost).AddressList[0];
             int port = 11000;
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port);
-            
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Host name is: {0} ", ipHost);
           //  Console.WriteLine("host array size is: {0}", size);
             Console.WriteLine("IP is " + ipAddr);
+            Console.ResetColor();
             logger.Trace("Endpoint Host is {0} on Port {1} at Host {2}", ipAddr, port.ToString(), ipHost);
 
             //string delimiter = " | ";
@@ -92,7 +96,9 @@ namespace SocketServer
                 // Начинаем слушать соединения
                 while (true)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Waiting on port {0}", ipEndPoint);
+                    Console.ResetColor();
                     logger.Trace("start listening with {0} max connection", maxConn);
                     // Программа приостанавливается, ожидая входящее соединение
                     Socket handler = sListener.Accept();
@@ -103,6 +109,7 @@ namespace SocketServer
                     byte[] bytes = new byte[1024];
                     int bytesRec = handler.Receive(bytes);
 
+                    byte[] bytez = new byte[1024];
                     data += Encoding.Default.GetString(bytes, 0, bytesRec); ////  not   Encoding.UTF8.GetString   !!!!!
 
                     // Показываем данные на консоли
@@ -114,21 +121,46 @@ namespace SocketServer
                     //string reply = "1410123456" + delimiter + "Test name of account";
                     //byte[] msg = Encoding.UTF8.GetBytes(reply);
 
-
-                    ///////   serialized JSON
-                    byte[] bytez = mem.ToArray();
-                    var str = System.Text.Encoding.Default.GetString(bytez);  ///  default! not UTF8!!!!
-
-                    logger.Debug("Reply: {0}", str);
-
-                    Console.WriteLine("Reply: {0}",str);
-                   
-                    ///
+                    if (data.Length < 30) /// max10 = 'CHECK' + max10 user + max10 password
+                    {
+                        string[] parts = data.Split(delimiter);
+                        string reply = "pass";
+                        if (parts[0] == "CHECK") {/// process CHECK request
+                            bytez = System.Text.Encoding.Default.GetBytes(reply);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("CHECK request received");
+                            
+                            Console.Write("Credentials: user = ");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write(parts[1]);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.Write(" and pass = ");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write(parts[2]);
+                            Console.ResetColor();
+                            Console.WriteLine("\n");
+                            Console.Write("RESULT: ");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write(reply);
+                            Console.WriteLine("\n");
+                            Console.ResetColor();
+                        } else
+                        {
+                            ///////   serialized JSON
+                            bytez = mem.ToArray();
+                            var str = System.Text.Encoding.Default.GetString(bytez);  ///  default! not UTF8!!!!
+                            logger.Debug("Reply: {0}", str);
+                            Console.WriteLine("Reply: {0}",str);
+                        }
+                    }
+      
+                    /// send bytez
                     
                     handler.Send(bytez);
 
                     if (data.IndexOf("<EOF>") > -1)
                     {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Server is shutting down...");
                         logger.Trace("Shutting down...");
                         break;
