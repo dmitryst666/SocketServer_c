@@ -121,62 +121,68 @@ namespace SocketServer
                     //string reply = "1410123456" + delimiter + "Test name of account";
                     //byte[] msg = Encoding.UTF8.GetBytes(reply);
 
-                    if (data.Substring(0,5) == "CHECK") /// 'CHECK' 
+
+                    if (data.Length > 5)
                     {
 
 
-                        string[] parts = data.Split(delimiter);
-                        int size = parts.Length;
-                        
-
-                        Console.WriteLine("parts count: {0}", size);
-                        string reply = "fail";
-                        
-                        if (size == 3) {/// process CHECK request
-                           
-                             reply = "pass";
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("CHECK request received");
-
-                            Console.Write("Credentials: user = ");
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write(parts[1]);
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.Write(" and pass = ");
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write(parts[2]);
-                            Console.ResetColor();
-                            Console.WriteLine("\n");
-                            Console.Write("RESULT: ");
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write(reply);
-                            Console.WriteLine("\n");
-                            Console.ResetColor();
-                            bytez = System.Text.Encoding.Default.GetBytes(reply);
-                        } else
+                        if (data.Substring(0, 5) == "CHECK") /// 'CHECK' 
                         {
-                            ///////   serialized JSON
-                            bytez = mem.ToArray();
-                            var str = System.Text.Encoding.Default.GetString(bytez);  ///  default! not UTF8!!!!
-                            logger.Debug("Reply: {0}", str);
-                            Console.WriteLine("Reply: {0}",str);
+
+
+                            string[] parts = data.Split(delimiter);
+                            int size = parts.Length;
+
+
+                            Console.WriteLine("parts count: {0}", size);
+                            string reply = "fail";
+
+                            if (size == 3)
+                            {/// process CHECK request
+
+                                reply = "pass";
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("CHECK request received");
+                                Console.Write("Credentials: user = ");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.Write(parts[1]);
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.Write(" and pass = ");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.Write(parts[2]);
+                                Console.ResetColor();
+                                Console.WriteLine("\n");
+                                Console.Write("RESULT: ");
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.Write(reply);
+                                Console.WriteLine("\n");
+                                Console.ResetColor();
+                                bytez = System.Text.Encoding.Default.GetBytes(reply);
+                            }
+                            else
+                            {
+                                ///////   serialized JSON
+                                //    bytez = mem.ToArray();
+                                //    var str = System.Text.Encoding.Default.GetString(bytez);  ///  default! not UTF8!!!!
+                                //    logger.Debug("Reply: {0}", str);
+                                //   Console.WriteLine("Reply: {0}",str);
+                            }
                         }
                     }
-      
                     /// send bytez
                     
                     handler.Send(bytez);
 
-                    if (data.IndexOf("<EOF>") > -1)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Server is shutting down...");
-                        logger.Trace("Shutting down...");
-                        break;
-                    }
+                    //if (data.IndexOf("<EOF>") > -1)
+                    //{
+                    //    Console.ForegroundColor = ConsoleColor.Yellow;
+                    //    Console.WriteLine("Server is shutting down...");
+                    //    logger.Trace("Shutting down...");
+                    //    break;
+                    //}
 
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                    //handler.Shutdown(SocketShutdown.Both);
+                    //handler.Close();
                 }
             }
             catch (Exception ex)
@@ -188,7 +194,7 @@ namespace SocketServer
                 
                 Console.ReadLine();
             }
-
+                   
             LogManager.Shutdown();
         }  //// end of Main
     }
